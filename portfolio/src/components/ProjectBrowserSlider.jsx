@@ -212,7 +212,7 @@ const ProjectBrowserSlider = ({
     }, [activeModalVideo]);
 
     // Triggers as soon as user scrolls towards the project section
-    const isInView = useInView(sectionRef, { margin: "100px 0px -50px 0px" });
+    const isInView = useInView(sectionRef, { margin: "200px 0px 200px 0px" });
 
     // Ref to track if auto-scrolling is currently active without tearing down animation loop
     const isAutoActiveRef = useRef(false);
@@ -236,7 +236,9 @@ const ProjectBrowserSlider = ({
             img.src = current.image;
             if (img.complete && img.naturalWidth) {
                 const targetMaxHeight = isMobile ? 340 : 520;
-                const containerWidth = scrollContainerRef.current ? scrollContainerRef.current.clientWidth : (isMobile ? 360 : 1000);
+                const containerWidth = (scrollContainerRef.current && scrollContainerRef.current.clientWidth > 50) 
+                    ? scrollContainerRef.current.clientWidth 
+                    : (isMobile ? 360 : 1000);
                 const imgAspect = img.naturalWidth / img.naturalHeight;
                 const renderedHeight = containerWidth / imgAspect;
                 setIsScrollable(renderedHeight > targetMaxHeight + 15);
@@ -259,9 +261,12 @@ const ProjectBrowserSlider = ({
             return;
         }
         const targetMaxHeight = isMobile ? 340 : 520;
-        if (e && e.target) {
+        const containerWidth = (scrollContainerRef.current && scrollContainerRef.current.clientWidth > 50) 
+            ? scrollContainerRef.current.clientWidth 
+            : (isMobile ? 360 : 1000);
+
+        if (e && e.target && e.target.naturalHeight) {
             const img = e.target;
-            const containerWidth = scrollContainerRef.current ? scrollContainerRef.current.clientWidth : (isMobile ? 360 : 1000);
             const imgAspect = img.naturalWidth / img.naturalHeight;
             const renderedHeight = containerWidth / imgAspect;
             setIsScrollable(renderedHeight > targetMaxHeight + 15);
@@ -269,15 +274,15 @@ const ProjectBrowserSlider = ({
         }
         if (scrollContainerRef.current) {
             const el = scrollContainerRef.current;
-            const scrollable = el.scrollHeight > targetMaxHeight + 15;
+            const scrollable = (el.scrollHeight - el.clientHeight) > 15;
             setIsScrollable(scrollable);
         }
     };
 
     // Auto-scroll stays active continuously when section is in view (Desktop & Mobile)
     useEffect(() => {
-        isAutoActiveRef.current = Boolean(autoScroll && isScrollable && isInView && !isCurrentVideo);
-    }, [autoScroll, isScrollable, isInView, isCurrentVideo]);
+        isAutoActiveRef.current = Boolean(autoScroll && isInView && !isCurrentVideo);
+    }, [autoScroll, isInView, isCurrentVideo]);
 
     const nextSlide = () => {
         setDirection(1);
@@ -294,39 +299,45 @@ const ProjectBrowserSlider = ({
         setCurrentIndex(idx);
     };
 
-    // Continuous, unpaused auto-scroll loop (Smooth continuous scrolling; user touch pauses & auto-resumes)
+    // Continuous, unpaused normal auto-scroll loop (Smooth continuous scrolling; user touch/wheel pauses & auto-resumes)
     useEffect(() => {
-        if (!autoScroll || !isScrollable || !isInView || !isImgLoaded || isCurrentVideo) return;
+        if (!autoScroll || !isInView || isCurrentVideo) return;
 
         let animId = null;
-        let pauseTimer = null;
+        let startTimer = null;
+        let loopTimer = null;
         let reachedBottom = false;
         let canScroll = false;
 
         setHasScrolled(false);
 
-        // Gentle pause (450ms) so user can comfortably see the top header before auto-scrolling begins
-        pauseTimer = setTimeout(() => {
+        // Gentle pause (350ms) so user can comfortably see the top header before auto-scrolling begins
+        startTimer = setTimeout(() => {
             canScroll = true;
-        }, 450);
+        }, 350);
 
         const step = () => {
             if (!scrollContainerRef.current) return;
             const el = scrollContainerRef.current;
             const maxScroll = el.scrollHeight - el.clientHeight;
 
+            // Ensure isScrollable state accurately reflects scroll height
+            if (maxScroll > 15 && !isScrollable) {
+                setIsScrollable(true);
+            }
+
             // Reset reachedBottom if user manually scrolled up
             if (el.scrollTop < maxScroll - 30 && reachedBottom) {
                 reachedBottom = false;
-                if (pauseTimer) {
-                    clearTimeout(pauseTimer);
-                    pauseTimer = null;
+                if (loopTimer) {
+                    clearTimeout(loopTimer);
+                    loopTimer = null;
                 }
             }
 
-            if (maxScroll > 15 && isAutoActiveRef.current && canScroll && !reachedBottom && !isUserInteractingRef.current) {
-                // Gentle, normal and comfortable reading speed (not fast, easy to read and inspect)
-                const speed = maxScroll > 3500 ? (isMobile ? 1.1 : 1.6) : (isMobile ? 0.85 : 1.25);
+            if (maxScroll > 15 && canScroll && !reachedBottom && !isUserInteractingRef.current) {
+                // Normal, calm, and comfortable reading pace (steady, not fast)
+                const speed = isMobile ? 0.75 : 0.95;
                 el.scrollTop += speed;
 
                 if (el.scrollTop > 30) {
@@ -334,18 +345,18 @@ const ProjectBrowserSlider = ({
                 }
 
                 // Check if reached bottom of screenshot
-                if (el.scrollTop >= maxScroll - 4) {
+                if (el.scrollTop >= maxScroll - 3) {
                     reachedBottom = true;
-                    // Do NOT auto-advance slides. User decides when to switch slides via arrows/thumbnails.
-                    // Pause comfortably at bottom, then smoothly scroll back to top of the same screenshot and loop.
-                    pauseTimer = setTimeout(() => {
+                    // Do NOT auto-advance slides. Keep user in control of slide navigation.
+                    // Pause comfortably at bottom, then smoothly scroll back to top of the SAME screenshot and repeat.
+                    loopTimer = setTimeout(() => {
                         if (!scrollContainerRef.current) return;
                         scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-                        pauseTimer = setTimeout(() => {
+                        loopTimer = setTimeout(() => {
                             reachedBottom = false;
                             setHasScrolled(false);
-                        }, 1400);
-                    }, 2200);
+                        }, 1200);
+                    }, 2000);
                 }
             }
 
@@ -356,10 +367,11 @@ const ProjectBrowserSlider = ({
 
         return () => {
             if (animId) cancelAnimationFrame(animId);
-            if (pauseTimer) clearTimeout(pauseTimer);
+            if (startTimer) clearTimeout(startTimer);
+            if (loopTimer) clearTimeout(loopTimer);
             if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
         };
-    }, [currentIndex, autoScroll, isScrollable, isInView, isCurrentVideo, isMobile]);
+    }, [currentIndex, autoScroll, isInView, isCurrentVideo, isMobile]);
 
     // User interaction handling (Mouse wheel, drag, scrollbar, touch)
     const handleUserInteractionStart = () => {
@@ -374,16 +386,16 @@ const ProjectBrowserSlider = ({
         if (resumeTimerRef.current) {
             clearTimeout(resumeTimerRef.current);
         }
-        // When user stops scrolling, dragging or touching, resume auto-scrolling after 2200ms
+        // When user stops scrolling, dragging or touching, resume auto-scrolling after 1600ms
         resumeTimerRef.current = setTimeout(() => {
             isUserInteractingRef.current = false;
-        }, 2200);
+        }, 1600);
     };
 
     const handleScroll = () => {
-        setHasScrolled(true);
-        handleUserInteractionStart();
-        handleUserInteractionEnd();
+        if (scrollContainerRef.current && scrollContainerRef.current.scrollTop > 30) {
+            setHasScrolled(true);
+        }
     };
 
     const handleWheel = (e) => {
@@ -1178,6 +1190,7 @@ const ProjectBrowserSlider = ({
                     onMouseDown={handleUserInteractionStart}
                     onMouseUp={handleUserInteractionEnd}
                     onTouchStart={handleTouchStart}
+                    onTouchMove={handleUserInteractionStart}
                     onTouchEnd={handleTouchEnd}
                     onTouchCancel={handleUserInteractionEnd}
                     className="custom-browser-scroll"
