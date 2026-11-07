@@ -7,7 +7,6 @@ const Preloader = ({ onComplete }) => {
     useEffect(() => {
         let current = 0;
         const interval = setInterval(() => {
-            // Smooth velocity curve
             const step = current < 45 ? 5 : current < 80 ? 4 : current < 95 ? 2 : 1;
             current += step;
 
@@ -15,7 +14,6 @@ const Preloader = ({ onComplete }) => {
                 current = 100;
                 setProgress(100);
                 clearInterval(interval);
-                // Brief smooth pause before revealing site
                 setTimeout(() => {
                     onComplete();
                 }, 200);
@@ -39,7 +37,7 @@ const Preloader = ({ onComplete }) => {
                 position: 'fixed',
                 inset: 0,
                 zIndex: 99999,
-                background: '#030d0a',
+                background: 'radial-gradient(ellipse 95% 75% at 50% 50%, #092e22 0%, #051c14 45%, #02100b 100%)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -50,12 +48,12 @@ const Preloader = ({ onComplete }) => {
                 userSelect: 'none',
             }}
         >
-            {/* Very soft, subtle ambient background glow */}
+            {/* Ambient Background Glow matching Hero */}
             <div style={{
                 position: 'absolute',
-                width: '45vw',
-                height: '45vw',
-                background: 'radial-gradient(circle at center, rgba(16, 185, 129, 0.06) 0%, transparent 65%)',
+                width: '50vw',
+                height: '50vw',
+                background: 'radial-gradient(circle at center, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.05) 40%, transparent 70%)',
                 filter: 'blur(80px)',
                 zIndex: 0,
                 pointerEvents: 'none',
@@ -69,15 +67,15 @@ const Preloader = ({ onComplete }) => {
                 alignItems: 'center',
                 maxWidth: '90vw',
             }}>
-                {/* Simple, understated "Please wait" indicator */}
+                {/* Subtle "Please wait" indicator */}
                 <div style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '7px',
-                    marginBottom: '14px',
+                    marginBottom: '12px',
                     fontSize: '11px',
-                    fontWeight: 500,
-                    color: 'rgba(255, 255, 255, 0.45)',
+                    fontWeight: 700,
+                    color: 'rgba(16, 185, 129, 0.42)',
                     letterSpacing: '2.5px',
                     textTransform: 'uppercase',
                     fontFamily: '"Outfit", sans-serif',
@@ -86,12 +84,12 @@ const Preloader = ({ onComplete }) => {
                         width: '5px',
                         height: '5px',
                         borderRadius: '50%',
-                        background: 'rgba(167, 243, 208, 0.65)',
+                        background: 'rgba(16, 185, 129, 0.5)',
                     }} />
                     <span>Please wait</span>
                 </div>
 
-                {/* Percentage Counter: Clean, light, transparent outline */}
+                {/* Percentage Counter (Exact Hero "DEVELOPMENT / SOFTWARE" style) */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'baseline',
@@ -101,13 +99,12 @@ const Preloader = ({ onComplete }) => {
                     <span 
                         className="loader-transparent-number"
                         style={{
-                            fontSize: 'clamp(4.8rem, 15vw, 8.5rem)',
-                            fontWeight: 800,
+                            fontSize: 'clamp(5.5rem, 18vw, 10.5rem)',
+                            fontWeight: 900,
                             fontFamily: '"Outfit", sans-serif',
-                            lineHeight: 0.9,
+                            lineHeight: 0.88,
+                            color: 'rgba(16, 185, 129, 0.32)',
                             letterSpacing: '-2px',
-                            color: 'transparent',
-                            WebkitTextStroke: '1.2px rgba(236, 253, 245, 0.65)',
                             display: 'inline-block',
                         }}
                     >
@@ -116,11 +113,10 @@ const Preloader = ({ onComplete }) => {
                     <span 
                         className="loader-transparent-percent"
                         style={{
-                            fontSize: 'clamp(1.6rem, 5vw, 2.6rem)',
-                            fontWeight: 700,
+                            fontSize: 'clamp(2rem, 7vw, 3.6rem)',
+                            fontWeight: 900,
                             fontFamily: '"Outfit", sans-serif',
-                            color: 'transparent',
-                            WebkitTextStroke: '1px rgba(236, 253, 245, 0.45)',
+                            color: 'rgba(16, 185, 129, 0.32)',
                             marginLeft: '4px',
                         }}
                     >
@@ -128,11 +124,11 @@ const Preloader = ({ onComplete }) => {
                     </span>
                 </div>
 
-                {/* Slim, understated progress bar */}
+                {/* Matching slim progress bar */}
                 <div style={{
-                    width: 'clamp(180px, 55vw, 240px)',
+                    width: 'clamp(180px, 55vw, 260px)',
                     height: '2.5px',
-                    background: 'rgba(255, 255, 255, 0.08)',
+                    background: 'rgba(16, 185, 129, 0.1)',
                     borderRadius: '999px',
                     position: 'relative',
                     overflow: 'hidden',
@@ -142,26 +138,26 @@ const Preloader = ({ onComplete }) => {
                         style={{
                             height: '100%',
                             width: `${progress}%`,
-                            background: 'rgba(167, 243, 208, 0.7)',
+                            background: 'rgba(16, 185, 129, 0.45)',
                             borderRadius: '999px',
                             transition: 'width 0.04s linear',
                         }}
                     />
                 </div>
 
-                {/* Subtle, soft "Better view at desktop" note */}
+                {/* Subtle "Better view at desktop" note */}
                 <div style={{
                     marginTop: '20px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
                     fontSize: '11px',
-                    fontWeight: 400,
-                    color: 'rgba(255, 255, 255, 0.38)',
+                    fontWeight: 500,
+                    color: 'rgba(16, 185, 129, 0.35)',
                     letterSpacing: '0.5px',
                     fontFamily: '"Outfit", sans-serif',
                 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.38)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(16, 185, 129, 0.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                         <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
                         <line x1="8" y1="21" x2="16" y2="21" />
                         <line x1="12" y1="17" x2="12" y2="21" />
