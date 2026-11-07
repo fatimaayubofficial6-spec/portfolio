@@ -18,7 +18,7 @@ const Preloader = ({ onComplete }) => {
                 // Brief pause at 100% before smoothly sliding up to reveal website
                 setTimeout(() => {
                     onComplete();
-                }, 200);
+                }, 220);
                 return;
             }
             setProgress(current);
@@ -81,36 +81,77 @@ const Preloader = ({ onComplete }) => {
                 alignItems: 'center',
                 maxWidth: '90vw',
             }}>
-                {/* Percentage Counter (Signature Website Emerald Gradient & Glow) */}
+                {/* Please wait badge */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '6px 16px',
+                        borderRadius: '999px',
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.35)',
+                        boxShadow: '0 0 20px rgba(16, 185, 129, 0.2)',
+                        marginBottom: '18px',
+                    }}
+                >
+                    <span style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#10b981',
+                        boxShadow: '0 0 10px #10b981',
+                    }} />
+                    <span style={{
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        color: '#34d399',
+                        letterSpacing: '2px',
+                        textTransform: 'uppercase',
+                        fontFamily: '"Outfit", sans-serif',
+                    }}>
+                        Please wait
+                    </span>
+                </motion.div>
+
+                {/* Percentage Counter (Transparent Outline Numbers with Emerald Glow) */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'baseline',
                     justifyContent: 'center',
-                    marginBottom: '10px',
+                    marginBottom: '16px',
                 }}>
-                    <span style={{
-                        fontSize: 'clamp(5.5rem, 18vw, 10.5rem)',
-                        fontWeight: 900,
-                        fontFamily: '"Outfit", sans-serif',
-                        lineHeight: 0.9,
-                        letterSpacing: '-3px',
-                        background: 'linear-gradient(135deg, #a7f3d0 0%, #34d399 30%, #10b981 70%, #059669 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        filter: 'drop-shadow(0 0 35px rgba(16, 185, 129, 0.55)) drop-shadow(0 0 70px rgba(5, 150, 105, 0.3))',
-                    }}>
+                    <span 
+                        className="loader-transparent-number"
+                        style={{
+                            fontSize: 'clamp(5.5rem, 18vw, 10.5rem)',
+                            fontWeight: 900,
+                            fontFamily: '"Outfit", sans-serif',
+                            lineHeight: 0.9,
+                            letterSpacing: '-2px',
+                            color: 'transparent',
+                            WebkitTextStroke: '2px #10b981',
+                            textShadow: '0 0 35px rgba(16, 185, 129, 0.45)',
+                            display: 'inline-block',
+                        }}
+                    >
                         {progress}
                     </span>
-                    <span style={{
-                        fontSize: 'clamp(2rem, 7vw, 3.5rem)',
-                        fontWeight: 800,
-                        fontFamily: '"Outfit", sans-serif',
-                        background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        filter: 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.6))',
-                        marginLeft: '4px',
-                    }}>
+                    <span 
+                        className="loader-transparent-percent"
+                        style={{
+                            fontSize: 'clamp(2rem, 7vw, 3.5rem)',
+                            fontWeight: 800,
+                            fontFamily: '"Outfit", sans-serif',
+                            color: 'transparent',
+                            WebkitTextStroke: '1.5px #34d399',
+                            textShadow: '0 0 20px rgba(16, 185, 129, 0.45)',
+                            marginLeft: '4px',
+                        }}
+                    >
                         %
                     </span>
                 </div>
@@ -139,6 +180,36 @@ const Preloader = ({ onComplete }) => {
                         }}
                     />
                 </div>
+
+                {/* Better view at desktop note */}
+                <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15, duration: 0.5 }}
+                    style={{
+                        marginTop: '22px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        letterSpacing: '0.6px',
+                        fontFamily: '"Outfit", sans-serif',
+                        background: 'rgba(16, 185, 129, 0.07)',
+                        border: '1px solid rgba(16, 185, 129, 0.22)',
+                        padding: '6px 16px',
+                        borderRadius: '999px',
+                        boxShadow: '0 0 15px rgba(0, 0, 0, 0.4)',
+                    }}
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                    </svg>
+                    <span>Better view at desktop</span>
+                </motion.div>
             </div>
         </motion.div>
     );
